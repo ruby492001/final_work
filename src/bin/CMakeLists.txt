@@ -1,1 +1,3 @@
-add_subdirectory( test_bin )
+add_subdirectory( server )
+add_subdirectory( client )
+

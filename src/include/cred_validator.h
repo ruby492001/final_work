@@ -1,0 +1,8 @@
+//
+// Created by ruby on 3/5/23.
+//
+
+#ifndef LOG_COLLECTOR_CRED_CHECKER_H
+#define LOG_COLLECTOR_CRED_CHECKER_H
+
+#endif //LOG_COLLECTOR_CRED_CHECKER_H

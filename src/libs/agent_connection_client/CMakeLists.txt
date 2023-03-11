@@ -1,6 +1,7 @@
 qt_add_library(agent_connection_client
         SHARED
         ../../include/agent_connection_client.h
+        ../../include/agent_proto.h
         agent_connection_client.cpp
         )
 
