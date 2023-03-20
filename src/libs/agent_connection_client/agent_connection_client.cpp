@@ -74,7 +74,7 @@ void AgentConnectionClient::onConnect()
 
 void AgentConnectionClient::onAddEvent( const AgentEvent& event )
 {
-     if( !event.isValid() || event.type() == Undefined )
+     if( !event.isValid() || event.type() == AgentEventUndefined )
      {
           return;
      }

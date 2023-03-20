@@ -6,5 +6,5 @@ qt_add_library(db_wrapper
 
 INCLUDE_DIRECTORIES( "../../include" )
 
-target_link_libraries(db_wrapper PUBLIC Qt::Core Qt::Network)
+target_link_libraries(db_wrapper PUBLIC Qt::Core Qt::Network Qt::Sql)
 

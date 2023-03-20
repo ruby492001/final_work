@@ -1,6 +1,9 @@
 #include "agent_trd.h"
 #include "agent_proto.h"
 #include "common.h"
+#include "cred_validator.h"
+#include "event_writer.h"
+#include "profile.h"
 
 
 ClientTrd::ClientTrd( quintptr socket )
@@ -165,13 +168,28 @@ void ClientTrdWrapper::handleLoginRequest( const QByteArray& arr )
      const AgentConnectionRequestAgentId* req = reinterpret_cast< const AgentConnectionRequestAgentId* >( arr.data() );
 
 
-     //todo: реализовать
-     qDebug() << "Login req" << req->agentId << QByteArray( req->uuid, sizeof( req->uuid ) );
      ServerProtoMain res;
      res.cmd = LOGIN_REQUEST_RESPONSE_CMD;
-     res.errorCode = NO_ERROR;
-     res.ok = true;
-     clientId_ = req->agentId;
+     bool success = false;
+     if( !CredValidator::validateCreds( req->agentId, QByteArray( req->uuid, sizeof( req->uuid ) ), success ) )
+     {
+          res.errorCode = INTERNAL_ERROR;
+          res.ok = false;
+     }
+     else if( !success )
+     {
+          res.errorCode = INCORRECT_LOGIN_ERROR;
+          res.ok = false;
+     }
+     else
+     {
+          res.cmd = LOGIN_REQUEST_RESPONSE_CMD;
+          res.errorCode = NO_ERROR;
+          res.ok = true;
+          clientId_ = req->agentId;
+     }
+     qDebug() << "Login req" << req->agentId << QByteArray( req->uuid, sizeof( req->uuid ) ) << res.ok << res.errorCode;
+
      if( sizeof( res ) != socket_->write( reinterpret_cast< char* >( &res ), sizeof( res ) ) )
      {
           qCritical() << "Cannot write response for login request";
@@ -225,14 +243,23 @@ void ClientTrdWrapper::handleGenAgentIdRequest( const QByteArray& arr )
 
      const AgentConnectionRequestAgentId* req = reinterpret_cast< const AgentConnectionRequestAgentId* >( arr.data() );
 
-     //todo: реализовать
-
      AgentConnectionResponse res;
-     res.agentId = clientId_ = ( ( quint64 ) QThread::currentThreadId() );
      res.res.cmd = GENERATE_AGENT_ID_RESPONSE_CMD;
-     res.res.errorCode = NO_ERROR;
-     res.res.ok = true;
-     qDebug() << "Gen agent id req" << QByteArray( req->uuid, sizeof( req->uuid ) ) << res.agentId;
+
+     quint32 id;
+     if( !CredValidator::createNewClient( QByteArray( req->uuid, sizeof( req->uuid ) ), id ) )
+     {
+          res.res.ok = false;
+          res.res.errorCode = INTERNAL_ERROR;
+     }
+     else
+     {
+          res.res.ok = true;
+          res.res.errorCode = NO_ERROR;
+          clientId_ = res.agentId = id;
+     }
+
+     qDebug() << "Gen agent id req: res:" << res.res.ok << "error:" << res.res.errorCode << res.agentId;
      if( sizeof( res ) != socket_->write( reinterpret_cast< char* >( &res ), sizeof( res ) ) )
      {
           qCritical() << "Cannot write response for login request";
@@ -263,12 +290,39 @@ void ClientTrdWrapper::handleSendDataRequest( const QByteArray& arr )
           returnError( INCORRECT_REQUEST_ERROR );
           return;
      }
+
      QByteArray responseBa;
      responseBa.resize( sizeof( ServerProtoMain ) );
      ServerProtoMain* response = reinterpret_cast< ServerProtoMain* >( responseBa.data() );
-     response->ok = true;
      response->cmd = SEND_DATA_RESPONSE_CMD;
-     response->errorCode = NO_ERROR;
+     switch( eventWriter->addToWriteEvent( clientId_, std::move( events ) ) )
+     {
+          case AtwerOk:
+          {
+               response->ok = true;
+               response->errorCode = NO_ERROR;
+               break;
+          }
+          case AtwerCountWarning:
+          {
+               response->ok = true;
+               response->errorCode = TO_MANY_REQUEST_WARNING;
+               break;
+          }
+          case AtwerCountError:
+          {
+               response->ok = false;
+               response->errorCode = TO_MANY_REQUESTS_ERROR;
+               break;
+          }
+          case AtwerDataTypeError:
+          {
+               response->ok = false;
+               response->errorCode = INCORRECT_DATA_TYPE_ERROR;
+               break;
+          }
+     }
+     qDebug() << "Write data result: " << response->ok << response->errorCode;
      if( responseBa.size() != socket_->write( responseBa ) )
      {
           qCritical() << "Cannot write response for handle send data req";
@@ -279,7 +333,6 @@ void ClientTrdWrapper::handleSendDataRequest( const QByteArray& arr )
           qCritical() << "Timeout write response for handle send data req";
           disconnect();
      }
-     // todo: реализовать
 }
 
 
@@ -307,6 +360,7 @@ void ClientTrdWrapper::onSocketError( QAbstractSocket::SocketError error )
 
 bool ClientTrdWrapper::parseEvents( const QByteArray& arr, QList< QPointer< AgentEvent > >& res )
 {
+     LOG_DURATION( "Parse events" )
      if( ( unsigned long long )arr.size() < sizeof( OneTimeRequest ) )
      {
           return true;
@@ -345,27 +399,28 @@ bool ClientTrdWrapper::parseEvents( const QByteArray& arr, QList< QPointer< Agen
                }
                if( FLAG_ON( event->flagsMsecs, BOOL_TYPE ) )
                {
-                    qDebug() << "Bool value received: " << clientId_ << time << event->id << MSEC( event->flagsMsecs ) << BOOL_VALUE( event->flagsMsecs );
                     res.push_back( new AgentEvent( event->id, time, MSEC( event->flagsMsecs ), BOOL_VALUE( event->flagsMsecs ) ) );
                }
                else if( FLAG_ON( event->flagsMsecs, FLOAT_TYPE ) )
                {
-                    qDebug() << "Float value received:" << clientId_ << time << event->id << MSEC( event->flagsMsecs ) << *( ( float* ) event->data );
                     res.push_back( new AgentEvent( event->id, time, MSEC( event->flagsMsecs ), AgentEventTypeFloat, event->data ) );
                }
                else if( FLAG_ON( event->flagsMsecs, UIN32_TYPE ) )
                {
-                    qDebug() << "Uint32 value received:" << clientId_ << time << event->id << MSEC( event->flagsMsecs ) << *( ( quint32* ) event->data );
                     res.push_back( new AgentEvent( event->id, time, MSEC( event->flagsMsecs ), AgentEventTypeUInt32, event->data ) );
                }
                else if( FLAG_ON( event->flagsMsecs, INT32_TYPE ) )
                {
-                    qDebug() << "Int32 value received:" << clientId_ << time << event->id << MSEC( event->flagsMsecs ) << *( ( qint32* ) event->data );
                     res.push_back( new AgentEvent( event->id, time, MSEC( event->flagsMsecs ), AgentEventTypeInt32, event->data ) );
                }
                else
                {
                     qCritical() << "Incorrect data size";
+                    return false;
+               }
+               if( !res.last()->isValid() )
+               {
+                    qCritical() << "Invalid event";
                     return false;
                }
           }

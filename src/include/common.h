@@ -9,7 +9,9 @@
 #define BOOL_VALUE(val)            ( ( val & ( 1 << 15 ) ) >> 15 )
 #define MSEC(val)                  ( val & 0x3FF )
 
-/// проверить установку флага
-
+/// @brief проверить установку флага
 #define FLAG_ON(val1, val2)        ( val1 & val2 )
+
+/// @brief преобразовать значение в QByteArray
+#define TO_QBYTEARRAY(val)         QByteArray( ( const char* )&val, sizeof( val ) )
 

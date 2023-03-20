@@ -6,5 +6,5 @@ qt_add_library(agent_trd
 
 INCLUDE_DIRECTORIES("../../include")
 
-target_link_libraries(agent_trd PUBLIC Qt::Core Qt::Network)
+target_link_libraries(agent_trd PUBLIC Qt::Core Qt::Network cred_validator db_wrapper event_writer)
 

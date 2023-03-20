@@ -6,5 +6,5 @@ qt_add_library(event_writer
 
 INCLUDE_DIRECTORIES( "../../include" )
 
-target_link_libraries(event_writer PUBLIC Qt::Core Qt::Network)
+target_link_libraries(event_writer PUBLIC Qt::Core Qt::Network agent_event)
 

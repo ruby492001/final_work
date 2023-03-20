@@ -12,7 +12,7 @@
 
 enum AgentEventType
 {
-     Undefined,
+     AgentEventUndefined,
      AgentEventTypeBool,
      AgentEventTypeFloat,
      AgentEventTypeUInt32,
@@ -26,7 +26,7 @@ class AgentEvent: public QObject
      Q_OBJECT
 public:
      AgentEvent( quint32 sensorId = 0, quint64 time = 0, quint16 msecs = UNDEFINED_MSECS, const QVariant& value = QVariant() );
-     AgentEvent( quint32 sensorId = 0, quint64 time = 0, quint16 msecs = UNDEFINED_MSECS, AgentEventType type = Undefined, const unsigned char* data = nullptr );
+     AgentEvent( quint32 sensorId = 0, quint64 time = 0, quint16 msecs = UNDEFINED_MSECS, AgentEventType type = AgentEventUndefined, const unsigned char* data = nullptr );
      AgentEvent( quint32 sensorId = 0, quint64 time = 0, quint16 msecs = UNDEFINED_MSECS, bool value = false );
      AgentEvent( const AgentEvent& rhs );
      AgentEvent& operator=( const AgentEvent& rhs );
@@ -54,5 +54,5 @@ private:
      quint64 time_;
      quint16 msecs_ = UNDEFINED_MSECS;
      unsigned char data_[MAX_EVENT_TYPE_SIZE];
-     AgentEventType type_ = Undefined;
+     AgentEventType type_ = AgentEventUndefined;
 };

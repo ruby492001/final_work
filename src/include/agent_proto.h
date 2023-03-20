@@ -25,6 +25,8 @@
 #define INCORRECT_REQUEST_ERROR              2
 #define TO_MANY_REQUESTS_ERROR               3
 #define INCORRECT_LOGIN_ERROR                4
+#define TO_MANY_REQUEST_WARNING              6
+#define INCORRECT_DATA_TYPE_ERROR            7
 
 /// @brief таймаут операций
 #define TIMEOUT 20000

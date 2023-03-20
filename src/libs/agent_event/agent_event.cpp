@@ -60,7 +60,7 @@ AgentEvent& AgentEvent::operator=( const AgentEvent& rhs )
 {
      if( !rhs.isValid() )
      {
-          type_ = Undefined;
+          type_ = AgentEventUndefined;
           return *this;
      }
      else
@@ -77,7 +77,7 @@ AgentEvent& AgentEvent::operator=( const AgentEvent& rhs )
 
 bool AgentEvent::isValid() const
 {
-     if( type_ == Undefined )
+     if( type_ == AgentEventUndefined )
      {
           return false;
      }
@@ -170,4 +170,10 @@ AgentEvent::AgentEvent( quint32 sensorId, quint64 time, quint16 msecs, bool valu
 {
      quint32 tmp = value;
      memcpy( data_, &tmp, MAX_EVENT_TYPE_SIZE );
+}
+
+
+bool AgentEvent::msecsExist() const
+{
+     return msecs_ != UNDEFINED_MSECS;
 }
