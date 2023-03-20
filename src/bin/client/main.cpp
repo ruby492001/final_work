@@ -8,11 +8,11 @@ int main( int argc, char** argv )
      QCoreApplication app( argc, argv );
      AgentConnectionClient cli( "127.0.0.1", 23456 );
 
-     cli.setAgentId( 2, "2Jas5deG6QP7k76FJJSDSI3vOHBSz0lr" );
+     //cli.setAgentId( 2, "ZyyqxlQrR7bxFdQDLECAl1wTZPoaBbN3" );
      cli.onConnect();
      qDebug() << cli.connectedState();
      /// 2'000'000
-     for( int a = 0; a < 400'000; a++ )
+     for( int a = 0; a < 200'000; a++ )
      {
           quint64 currentTime = QDateTime::currentSecsSinceEpoch();
           cli.onAddEvent( AgentEvent( 0, currentTime,        QTime::currentTime().msec(), QVariant::fromValue( true ) ) );

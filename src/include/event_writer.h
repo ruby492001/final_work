@@ -25,13 +25,19 @@ public slots:
      void stop();
 
 private:
+     struct DataToWrite
+     {
+          QVariantList clientId;
+          QVariantList sensorId;
+          QVariantList time;
+          QVariantList msecs;
+          QVariantList data;
+     };
+
+private:
      /// @return если false параметры не были успешно записаны, иначе true
      /// @attention внутри происходит вызов addTypeIfNeed(см. attention)
      bool writeEvents( const QQueue< QPair< quint32, QList< QPointer< AgentEvent > > > >& events );
-
-     /// @brief запись одного события
-     /// @return true, если запись завершилась успехом, иначе false
-     bool writeOneEvent( quint32 clientId, const AgentEvent& event, SqlWrapperProtection* sqlConnection );
 
      /// @brief добавляет новый тип данных, если его не существовало ранее
      /// @return true, если тип был добавлен или добавление не требуется. Иначе false.
@@ -53,6 +59,7 @@ private:
      /// Если type не соответствует ранее существовавшему типу, возвращается false. Добавление такого события опасно для базы.
      bool validateTypeIfExist( quint32 clientId, quint32 sensorId, const AgentEventType& type );
 
+     inline void prepareEvent( quint32 clientId, const AgentEvent& event, DataToWrite& data );
 private:
      const quint64 warnCount_;
      const quint64 errorCount_;

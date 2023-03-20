@@ -1,5 +1,6 @@
 #include <QSqlError>
 #include "db_wrapper.h"
+#include "profile.h"
 
 SqlWrapper* SqlConnectionManager::writeConnection_ = nullptr;
 bool SqlConnectionManager::writeConnectionIsFree_ = true;
@@ -315,22 +316,25 @@ bool SqlWrapper::registerNewDataType( quint64 id, quint8 dataType )
 }
 
 
-bool SqlWrapper::writeEvent( quint32 clientId, quint32 sensorId, quint64 time, const QVariant& msec, const QByteArray& data )
+bool SqlWrapper::writeSomeEvents( const QVariantList& clientId, const QVariantList& sensorId, const QVariantList& time,
+                                  const QVariantList& msec, const QVariantList& data )
 {
+
      QSqlQuery query( db_ );
      query.prepare( "INSERT INTO data(client_id, sensor_id, time, msecs, data) "
-                    "VALUES( :client_id, :sensor_id, :time, :msecs, :data );" );
-     query.bindValue( ":client_id", clientId );
-     query.bindValue( ":sensor_id", sensorId );
-     query.bindValue( ":time", time );
-     if( msec.isValid() )
+                    "VALUES( ?, ?, ?, ?, ? );" );
+     query.addBindValue( clientId );
+     query.addBindValue( sensorId );
+     query.addBindValue( time );
+     query.addBindValue( msec );
+     query.addBindValue( data );
+     if( query.execBatch() )
      {
-          query.bindValue( ":msecs", msec.toUInt() );
+          return true;
      }
      else
      {
-          query.bindValue( ":msecs", QVariant() );
+          qDebug() << "Write some events error:" << query.lastError();
+          return false;
      }
-     query.bindValue( ":data", data );
-     return query.exec();
 }

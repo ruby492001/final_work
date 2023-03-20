@@ -76,9 +76,7 @@ public:
      bool addCreds( quint32 clientId, const QByteArray& uuid );
      QList< QPair< quint32, QByteArray > > existClient();
 
-     /// для записи событий
-     /// @param msec - quint16. Сделано из-за отсутствия аналога std::optional в Qt
-     bool writeEvent( quint32 clientId, quint32 sensorId, quint64 time, const QVariant& msec, const QByteArray& data );
+     bool writeSomeEvents( const QVariantList& clientId, const QVariantList& sensorId, const QVariantList& time, const QVariantList& msec, const QVariantList& data );
 
      /// для работы с типами данных
      QList< QPair< quint64, quint8 > > registeredDataTypes();
