@@ -2,7 +2,7 @@
 
 
 AgentConnectionServer::AgentConnectionServer( quint16 port )
-:server_( new TcpListenServer ), port_( port )
+:port_( port )
 {
      server_ = new TcpListenServer;
      connect( server_, &TcpListenServer::sNewConnection, this, &AgentConnectionServer::onNewConnection );
