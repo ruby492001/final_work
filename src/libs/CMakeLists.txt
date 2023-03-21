@@ -5,4 +5,4 @@ add_subdirectory( agent_event )
 add_subdirectory( event_writer )
 add_subdirectory( cred_validator )
 add_subdirectory( db_wrapper )
-
+add_subdirectory( view_cmd )
