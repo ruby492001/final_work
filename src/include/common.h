@@ -15,3 +15,11 @@
 /// @brief преобразовать значение в QByteArray
 #define TO_QBYTEARRAY(val)         QByteArray( ( const char* )&val, sizeof( val ) )
 
+
+#pragma pack( push, 1 )
+struct NetworkPackage
+{
+     qsizetype size;               // размер данных + размер size
+     unsigned char data[ 1 ];
+};
+#pragma pack(pop)

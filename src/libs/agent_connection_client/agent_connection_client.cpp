@@ -1,5 +1,7 @@
 #include "agent_connection_client.h"
 #include "agent_proto.h"
+#include "common.h"
+
 
 AgentConnectionClient::AgentConnectionClient( const QString& ipAddress, const quint16 port )
 :port_( port )

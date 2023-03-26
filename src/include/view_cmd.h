@@ -6,6 +6,18 @@
 
 #define INVALID_PLUGIN_ID 0
 
+class ViewCommand;
+
+/// @brief сериализует cmd в формате NetworkPackage для передачи по сети
+QByteArray serializeViewCmd( const ViewCommand& cmd );
+
+
+/// @brief десериализует ViewCommand из потока data, полученном по сети. Если данные удалось десериализовать, они удаляются из массива
+/// остальная часть массива не трогается. Если данные десериализовать не получилось, массив остается без изменения
+/// @return Валидный ViewCommand, если пришли все части. Невалидный ViewCommand, если получены не все данные
+ViewCommand deserializeViewCmd( QByteArray& data );
+
+
 
 class ViewArgs: public QObject
 {
@@ -23,7 +35,7 @@ public:
 
      friend QDataStream& operator<<( QDataStream& out, const ViewArgs& myObj );
      friend QDataStream& operator>>( QDataStream& in, ViewArgs& myObj );
-
+     friend QDebug& operator<<( QDebug& d, const ViewArgs& cmd );
 private:
      QVariantList variables_;
 };
@@ -31,6 +43,9 @@ private:
 
 QDataStream& operator<<( QDataStream& out, const ViewArgs& myObj );
 QDataStream& operator>>( QDataStream& in, ViewArgs& myObj );
+QDebug& operator<<( QDebug& d, const ViewArgs& cmd );
+
+Q_DECLARE_METATYPE( ViewArgs )
 
 
 class ViewCommand: public QObject
@@ -47,12 +62,13 @@ public:
 
      void addArg( const ViewArgs& arg );
      quint32 count() const;
-     const ViewArgs* at( quint32 idx );
+     const ViewArgs* at( quint32 idx ) const;
      ViewCommand& operator=( const ViewCommand& rhs );
 
      friend QDataStream& operator<<( QDataStream& out, const ViewCommand& myObj );
      friend QDataStream& operator>>( QDataStream& in, ViewCommand& myObj );
 
+     friend QDebug& operator<<( QDebug& d, const ViewCommand& cmd );
 private:
      quint32 plgId_;
      quint32 command_;
@@ -62,3 +78,8 @@ private:
 
 QDataStream& operator<<( QDataStream& out, const ViewCommand& myObj );
 QDataStream& operator>>( QDataStream& in, ViewCommand& myObj );
+QDebug& operator<<( QDebug& d, const ViewCommand& cmd );
+
+Q_DECLARE_METATYPE( ViewCommand )
+Q_DECLARE_METATYPE( QList<ViewArgs> )
+

@@ -1,4 +1,5 @@
 #include "view_cmd.h"
+#include "common.h"
 
 
 ViewArgs::ViewArgs( const QVariantList& variables )
@@ -62,6 +63,13 @@ QDataStream& operator>>( QDataStream& in, ViewArgs& myObj )
 }
 
 
+QDebug& operator<<( QDebug& d, const ViewArgs& cmd )
+{
+     d << cmd.variables_;
+     return d;
+}
+
+
 ViewArgs& ViewArgs::operator=( const ViewArgs& rhs )
 {
      variables_ = rhs.variables_;
@@ -110,7 +118,7 @@ quint32 ViewCommand::count() const
 }
 
 
-const ViewArgs* ViewCommand::at( quint32 idx )
+const ViewArgs* ViewCommand::at( quint32 idx ) const
 {
      return &arguments_.at( idx );
 }
@@ -130,7 +138,6 @@ QDataStream& operator<<( QDataStream& out, const ViewCommand& myObj )
      out << QVariant::fromValue( myObj.plgId_ ) << QVariant::fromValue( myObj.command_ ) <<
                QVariant::fromValue( myObj.arguments_ );
 
-               //<< QVariant::fromValue( myObj.arguments_.count() );
      return out;
 }
 
@@ -154,4 +161,49 @@ QDataStream& operator>>( QDataStream& in, ViewCommand& myObj )
 bool ViewCommand::isValid() const
 {
      return plgId_ != INVALID_PLUGIN_ID;
+}
+
+
+QByteArray serializeViewCmd( const ViewCommand& cmd )
+{
+     QByteArray cmdData;
+     QDataStream stream( &cmdData, QIODevice::WriteOnly );
+     stream << cmd;
+
+     qsizetype size = cmdData.size() + sizeof( size );
+     QByteArray data;
+     data.resize( sizeof( size ) );
+     memcpy( data.data(), &size, sizeof( size ) );
+     data += cmdData;
+     return data;
+}
+
+
+ViewCommand deserializeViewCmd( QByteArray& data )
+{
+     qsizetype packMinSize = sizeof( NetworkPackage );
+     if( data.size() < packMinSize )
+     {
+          // не пришёл даже заголовок
+          return {};
+     }
+     NetworkPackage* package = reinterpret_cast< NetworkPackage* >( data.data() );
+     if( package->size > data.size() )
+     {
+          // не все данные пришли
+          return {};
+     }
+     QByteArray packageData( reinterpret_cast< const char* >( package->data ), package->size - sizeof( NetworkPackage::size ) );
+     QDataStream stream( &packageData, QIODevice::ReadOnly );
+     ViewCommand cmd;
+     stream >> cmd;
+     data.remove( 0, package->size );
+     return cmd;
+}
+
+
+QDebug& operator<<( QDebug& d, const ViewCommand& cmd )
+{
+     d << "Plugin id:" << cmd.plgId_ << "command:" << cmd.command_ << "args:" << cmd.arguments_;
+     return d;
 }

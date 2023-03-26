@@ -35,13 +35,6 @@
 #pragma pack(push,1)
 
 
-struct NetworkPackage
-{
-     qsizetype size;
-     unsigned char data[ 1 ];
-};
-
-
 struct AgentProtoMain
 {
      quint32 cmd;
