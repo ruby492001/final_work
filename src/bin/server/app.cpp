@@ -4,7 +4,7 @@
 ServerApp::ServerApp( int argc, char** argv )
 :QCoreApplication( argc, argv )
 {
-     manager_ = new SqlConnectionManager( "test_db.db" );
+     manager_ = new SqlConnectionManager( "../etc/event.db" );
      CredValidator::init();
      eventWriter = new EventWriter( 100'000'000, 500'000'000 );
      server_ = new AgentConnectionServer( 23456 );

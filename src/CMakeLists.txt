@@ -16,7 +16,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Woverloaded-vir
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Network Sql WebSockets)
 qt_standard_project_setup()
 
+set( RESULT_OUTPUT ${CMAKE_SOURCE_DIR}/../result )
+
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${RESULT_OUTPUT}/lib )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${RESULT_OUTPUT}/bin )
 
 # добавляем сюда проекты, которые требуется собирать
-add_subdirectory(libs)
-add_subdirectory(bin)
+add_subdirectory( libs )
+add_subdirectory( bin )
+add_subdirectory( view_plg )
+add_subdirectory( srv_plg )
