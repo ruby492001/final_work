@@ -338,3 +338,9 @@ bool SqlWrapper::writeSomeEvents( const QVariantList& clientId, const QVariantLi
           return false;
      }
 }
+
+
+QSqlDatabase* SqlWrapper::db()
+{
+     return &db_;
+}

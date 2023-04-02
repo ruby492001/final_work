@@ -81,6 +81,7 @@ public:
      /// для работы с типами данных
      QList< QPair< quint64, quint8 > > registeredDataTypes();
      bool registerNewDataType( quint64 id, quint8 dataType );
+     QSqlDatabase* db();
 
 private:
      QSqlDatabase db_;
