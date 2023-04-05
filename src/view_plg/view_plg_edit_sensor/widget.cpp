@@ -28,7 +28,6 @@ EditSensorConfigWidget::EditSensorConfigWidget( QWidget* parent )
      treeView_ = new QTreeView( this );
      QSortFilterProxyModel* sortModel = new QSortFilterProxyModel( this );
      sortModel->setSourceModel( model_ );
-     sortModel->column
      treeView_->setModel( sortModel );
      treeView_->setRootIsDecorated( false );
      treeView_->setSortingEnabled( true );
