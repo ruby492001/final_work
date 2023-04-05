@@ -10,20 +10,20 @@
 class ViewPluginItf: public QObject
 {
 public:
-     virtual void name() = 0;
-     virtual quint32 id() = 0;
-     virtual QIcon icon() = 0;
+     virtual QString name() const= 0;
+     virtual quint32 id() const = 0;
+     virtual QIcon icon() const = 0;
+     virtual quint32 priority() const = 0;
 
-     virtual void init() = 0;
-     virtual void initDatabase( QSqlDatabase* db );
-     virtual QWidget* widget() = 0;
+     virtual void init( QSqlDatabase* db ) = 0;
+     virtual QWidget* widget( QWidget* parent ) = 0;
 
 public slots:
-     void onNetResponse( const ViewCommand& cmd );
+     virtual void onNetResponse( const ViewCommand& cmd ) = 0;
 
 signals:
      void sChangeIcon();
      void sSendNetRequest( const ViewCommand& cmd );
 };
 
-Q_DECLARE_INTERFACE( ServicePluginItf, "FINAL_WORK.ViewPluginItf/1.0" )
+Q_DECLARE_INTERFACE( ViewPluginItf, "FINAL_WORK.ViewPluginItf/1.0" )

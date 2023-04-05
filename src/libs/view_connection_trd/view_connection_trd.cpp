@@ -1,3 +1,5 @@
+#include <QCoreApplication>
+
 #include "view_connection_server.h"
 #include "view_connection_trd.h"
 #include "common.h"
@@ -66,10 +68,8 @@ void ViewTrd::onStop()
 ViewTrdWrapper::ViewTrdWrapper( quintptr socket )
 :sockHandle_( socket )
 {
-     connect( this, &ViewTrdWrapper::sViewRequest, this, &ViewTrdWrapper::onViewRequestDbg );
-     /// todo: remove me
-
-     connect( this, &ViewTrdWrapper::sViewRequest, this, &ViewTrdWrapper::onSendViewResponse );
+     connect( this, SIGNAL( sViewRequest( const ViewCommand& ) ), this, SLOT( onViewRequestDbg( const ViewCommand& ) ) );
+     loadPlugins();
 }
 
 
@@ -82,6 +82,11 @@ ViewTrdWrapper::~ViewTrdWrapper()
      socket_->close();
      delete socket_;
      socket_ = nullptr;
+     foreach( auto& plg, plugins_ )
+     {
+          delete plg;
+     }
+     plugins_.clear();
 }
 
 
@@ -169,4 +174,55 @@ void ViewTrdWrapper::onSendViewResponseDbg( const ViewCommand& cmd )
 void ViewTrdWrapper::onViewRequestDbg( const ViewCommand& cmd )
 {
      DEBUG_VIEWTRD << "Received request" << cmd;
+}
+
+
+void ViewTrdWrapper::loadPlugins()
+{
+     QDir dir( QCoreApplication::applicationDirPath() + "/../srv_plg/");
+     if( !dir.exists() )
+     {
+          qCritical() << "Folder" << dir.path() << "not exist";
+          return;
+     }
+     QStringList fileList = dir.entryList( QStringList(), QDir::Files );
+     for( const QString& str: fileList )
+     {
+          if( !str.startsWith( "libsrv_plg_" ) )
+          {
+               continue;
+          }
+          QPluginLoader loader( dir.absolutePath() + QDir::separator() + str );
+          if( !loader.load() )
+          {
+               qCritical() << "Cannot load plugin with name" << str << loader.errorString();
+               continue;
+          }
+          ServicePluginItf* plg = qobject_cast< ServicePluginItf* >( loader.instance() );
+          if( !plg )
+          {
+               qCritical() << "Error cast:" << str;
+               continue;
+          }
+          qDebug() << "Loaded plugin with id:" << plg->pluginId();
+
+          plugins_.append( plg );
+     }
+
+     foreach( const auto& plugin, plugins_ )
+     {
+          if( !plugin->init() )
+          {
+               qCritical() << "Plugin init error:" << plugin->pluginId();
+               continue;
+          }
+          if( !plugin->initDbTables() )
+          {
+               qCritical() << "Init db tables error:" << plugin->pluginId();
+               continue;
+          }
+          connect( this, SIGNAL( sViewRequest( const ViewCommand& ) ), plugin, SLOT( onNetRequest( const ViewCommand& ) ) );
+          connect( plugin, SIGNAL( sSendResponse( const ViewCommand& ) ), this, SLOT( onSendViewResponse( const ViewCommand& ) ) );
+     }
+     qDebug() << "Inited plugin count:" << plugins_.count();
 }

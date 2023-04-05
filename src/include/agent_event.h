@@ -19,6 +19,7 @@ enum AgentEventType
      AgentEventTypeInt32
 };
 
+QString toString( AgentEventType type );
 
 
 class AgentEvent: public QObject

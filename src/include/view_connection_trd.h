@@ -4,6 +4,8 @@
 #include <QtCore>
 #include <QtNetwork>
 #include "view_cmd.h"
+#include "srvplg_itf.h"
+
 
 
 class ViewTrdWrapper: public QObject
@@ -45,10 +47,14 @@ private slots:
      void onViewRequestDbg( const ViewCommand& cmd );
 
 private:
+     void loadPlugins();
+
+private:
      QTcpSocket* socket_ = nullptr;
      QByteArray pendingData_;
      QQueue<ViewCommand> requests_;
      quintptr sockHandle_;
+     QList< ServicePluginItf* > plugins_;
 };
 
 

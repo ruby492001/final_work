@@ -177,3 +177,35 @@ bool AgentEvent::msecsExist() const
 {
      return msecs_ != UNDEFINED_MSECS;
 }
+
+
+QString toString( AgentEventType type )
+{
+     switch( type )
+     {
+          case AgentEventUndefined:
+          {
+               return QObject::tr( "Неопределёный тип" );
+          }
+          case AgentEventTypeBool:
+          {
+               return QObject::tr( "Бинарный тип");
+          }
+          case AgentEventTypeFloat:
+          {
+               return QObject::tr( "Число с плавающей точкой" );
+          }
+          case AgentEventTypeUInt32:
+          {
+               return QObject::tr( "Беззнаковое целое число" );
+          }
+          case AgentEventTypeInt32:
+          {
+               return QObject::tr( "Знаковое целое число" );
+          }
+          default:
+          {
+               return QObject::tr( "Неопознаный тип данных" );
+          }
+     }
+}
