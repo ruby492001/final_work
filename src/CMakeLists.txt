@@ -23,6 +23,7 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${RESULT_OUTPUT}/bin )
 
 # добавляем сюда проекты, которые требуется собирать
 add_subdirectory( libs )
+add_subdirectory( external_libs )
 add_subdirectory( bin )
 add_subdirectory( view_plg )
 add_subdirectory( srv_plg )

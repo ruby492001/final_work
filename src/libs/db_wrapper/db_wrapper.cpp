@@ -1,6 +1,7 @@
 #include <QSqlError>
 #include "db_wrapper.h"
 #include "profile.h"
+#include "agent_event.h"
 
 SqlWrapper* SqlConnectionManager::writeConnection_ = nullptr;
 bool SqlConnectionManager::writeConnectionIsFree_ = true;
@@ -343,4 +344,87 @@ bool SqlWrapper::writeSomeEvents( const QVariantList& clientId, const QVariantLi
 QSqlDatabase* SqlWrapper::db()
 {
      return &db_;
+}
+
+
+QList<QPair<quint64, double>> SqlWrapper::getData( quint64 id, quint64 startTime, quint64 endTime )
+{
+     QList<QPair<quint64, double>> res;
+     QSqlQuery query( db_ );
+     quint32 clientId = id >> 32;
+     quint32 sensorId  = id & 0xffffffff;
+     AgentEventType eventType = AgentEventType::AgentEventUndefined;
+     auto types = registeredDataTypes();
+     foreach( auto type, types )
+     {
+          if( type.first == id )
+          {
+               eventType = ( AgentEventType )type.second;
+               break;
+          }
+     }
+     if( eventType == AgentEventType::AgentEventUndefined )
+     {
+          qCritical() << "Cannot get event type to id" << id;
+          return {};
+     }
+     query.prepare( "SELECT time, msecs, data FROM data WHERE client_id = :client_id AND sensor_id = :sensor_id AND time > :start_time AND time < :end_time;" );
+     query.bindValue( ":client_id", clientId );
+     query.bindValue( ":sensor_id", sensorId );
+     query.bindValue( ":start_time", startTime );
+     query.bindValue( ":end_time", endTime );
+     if( !query.exec() )
+     {
+          qCritical() << "Cannot get data" << query.lastError();
+          return {};
+     }
+     while( query.next() )
+     {
+          QPair< quint64, double > tmp;
+          tmp.first = query.value( 0 ).toULongLong();
+          if( query.value( 1 ).toUInt() != 1000 )
+          {
+               tmp.first += query.value( 1 ).toUInt();
+          }
+          QByteArray data = query.value( 2 ).toByteArray();
+          if( data.count() == 1 )
+          {
+               // bool
+               if( data[ 0 ] == 0 )
+               {
+                    tmp.second = 0;
+               }
+               else
+               {
+                    tmp.second = 1;
+               }
+          }
+          else
+          {
+               switch( eventType )
+               {
+                    case AgentEventTypeFloat:
+                    {
+                         tmp.second = *( ( float* )data.data() );
+                         break;
+                    }
+                    case AgentEventTypeUInt32:
+                    {
+                         tmp.second = *( ( quint32* )data.data() );
+                         break;
+                    }
+                    case AgentEventTypeInt32:
+                    {
+                         tmp.second = *( ( qint32* )data.data() );
+                         break;
+                    }
+                    default:
+                    {
+                         break;
+                    }
+               }
+          }
+          res.push_back( tmp );
+     }
+     return res;
 }

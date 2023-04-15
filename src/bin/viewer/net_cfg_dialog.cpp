@@ -55,11 +55,5 @@ void NetCfgDialog::onOk()
                                  tr( "Работа программы невозможна без адреса сервера. Введите адрес сервера." ), QMessageBox::Ok );
           return;
      }
-     if( !QHostAddress( addr_->text() ).isNull() )
-     {
-          QMessageBox::critical( this, tr( "Невалидный адрес сервера" ),
-                                 tr( "Введён невалидный адрес сервера. Введите правильный адрес сервера." ), QMessageBox::Ok );
-          return;
-     }
      accept();
 }

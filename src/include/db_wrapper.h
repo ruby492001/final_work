@@ -78,6 +78,7 @@ public:
 
      bool writeSomeEvents( const QVariantList& clientId, const QVariantList& sensorId, const QVariantList& time, const QVariantList& msec, const QVariantList& data );
 
+     QList< QPair< quint64, double > > getData( quint64 id, quint64 startTime, quint64 endTime );
      /// для работы с типами данных
      QList< QPair< quint64, quint8 > > registeredDataTypes();
      bool registerNewDataType( quint64 id, quint8 dataType );

@@ -85,7 +85,7 @@ QVariant EditSensorModel::headerData( int section, Qt::Orientation orientation, 
           }
           case 2:
           {
-               return tr( "Имя" );
+               return tr( "Название датчика" );
           }
           case 3:
           {

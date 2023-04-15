@@ -7,14 +7,14 @@
 
 MainWindow::MainWindow()
 {
-//     NetCfgDialog dlg;
-//     if( !dlg.exec() )
-//     {
-//          exit( 0 );
-//     }
-
-     //client_ = new ViewConnectionClient( dlg.addr(), dlg.port() );
-     client_ = new ViewConnectionClient( "localhost", 54321 );
+     NetCfgDialog dlg;
+     if( !dlg.exec() )
+     {
+          exit( 0 );
+     }
+     setWindowTitle( tr( "Программа просмотра данных ") );
+     client_ = new ViewConnectionClient( dlg.addr(), dlg.port() );
+     //client_ = new ViewConnectionClient( "localhost", 54321 );
 
      connect( client_, &ViewConnectionClient::sConnectionError, this, &MainWindow::onConnectionLost, Qt::DirectConnection );
      connect( client_, &ViewConnectionClient::sConnected, this, &MainWindow::onConnected, Qt::DirectConnection );
