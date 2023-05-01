@@ -3,6 +3,7 @@ qt_add_library(view_plg_edit_sensor
         edit_sensor.cpp
         widget.cpp
         model.cpp
+        delegate.cpp
         )
 
 INCLUDE_DIRECTORIES( "../../include" . )

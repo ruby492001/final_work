@@ -51,6 +51,9 @@ void EditSensorView::onSendChanges( const QList<SensorParam>& cmd )
           ViewArgs tmpArg;
           tmpArg.addVariable( cur.clientSensorId );
           tmpArg.addVariable( cur.userName );
+          tmpArg.addVariable( cur.place );
+          tmpArg.addVariable( cur.type );
+          tmpArg.addVariable( cur.measure );
           command.addArg( tmpArg );
      }
      emit sSendNetRequest( command );
@@ -92,7 +95,10 @@ void EditSensorView::onUpdateTableRes( const ViewCommand& cmd )
      {
           SensorParam tmp{ cmd.at( idx )->at( 0 )->toLongLong(),
                            ( AgentEventType )cmd.at( idx )->at( 1 )->toInt(),
-                           cmd.at( idx )->at( 2 )->toString() };
+                           cmd.at( idx )->at( 2 )->toString(),
+                           cmd.at( idx )->at( 3 )->toString(),
+                           cmd.at( idx )->at( 4 )->toString(),
+                           cmd.at( idx )->at( 5 )->toString()};
           data.push_back( tmp );
      }
      emit sUpdateTable( data );

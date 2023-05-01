@@ -77,6 +77,9 @@ void EditSensorSrv::onGetValues()
           arg.addVariable( cur.clientSensorId );
           arg.addVariable( ( quint32 )cur.eventType );
           arg.addVariable( cur.userName );
+          arg.addVariable( cur.place );
+          arg.addVariable( cur.type );
+          arg.addVariable( cur.measure );
           cmd.addArg( arg );
      }
      emit sSendResponse( cmd );
@@ -89,7 +92,8 @@ QList< SensorParam > EditSensorSrv::parseCmdToSensorParam( const ViewCommand& cm
      for( quint32 idx = 0; idx < cmd.count(); idx++ )
      {
           const ViewArgs* arg = cmd.at( idx );
-          SensorParam tmp{ arg->at( 0 )->toLongLong(), AgentEventUndefined, arg->at( 1 )->toString() };
+          SensorParam tmp{ arg->at( 0 )->toLongLong(), AgentEventUndefined, arg->at( 1 )->toString(),
+                           arg->at( 2 )->toString(), arg->at( 3 )->toString(), arg->at( 4 )->toString() };
           res.push_back( tmp );
      }
      return res;

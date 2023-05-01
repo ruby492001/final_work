@@ -10,6 +10,9 @@ struct SensorParam
      qint64 clientSensorId;
      AgentEventType eventType;
      QString userName;
+     QString place;
+     QString type;
+     QString measure;
 };
 
 #define ES_GET_VALUES_REQ 1

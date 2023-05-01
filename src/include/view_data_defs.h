@@ -6,6 +6,9 @@ struct SensorParam
 {
      qint64 clientSensorId;
      QString userName;
+     QString place;
+     QString type;
+     QString measure;
 };
 
 

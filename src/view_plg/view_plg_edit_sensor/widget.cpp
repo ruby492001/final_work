@@ -1,5 +1,6 @@
 #include "widget.h"
 #include "edit_sensor.h"
+#include "delegate.h"
 
 
 EditSensorConfigWidget::EditSensorConfigWidget( QWidget* parent )
@@ -31,6 +32,10 @@ EditSensorConfigWidget::EditSensorConfigWidget( QWidget* parent )
      treeView_->setModel( sortModel );
      treeView_->setRootIsDecorated( false );
      treeView_->setSortingEnabled( true );
+     auto delegate = new Delegate( treeView_ );
+     treeView_->setItemDelegateForColumn( 4, delegate );
+     treeView_->setItemDelegateForColumn( 5, delegate );
+     treeView_->setItemDelegateForColumn( 6, delegate );
      lyt->setRowStretch( 1, 10 );
      lyt->addWidget( treeView_, 1, 0, 1, 3);
 }

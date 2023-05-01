@@ -15,6 +15,9 @@ public:
      QString resName();
      quint64 resId();
      QColor resColor();
+     QString place();
+     QString type();
+     QString measure();
 
 
 public slots:
@@ -28,6 +31,9 @@ private:
      QString resName_;
      quint64 resId_;
      QColor resColor_;
+     QString place_;
+     QString type_;
+     QString measure_;
      AddSensorModel* model_;
      QTreeView* list_;
      QPushButton* selectColor_;

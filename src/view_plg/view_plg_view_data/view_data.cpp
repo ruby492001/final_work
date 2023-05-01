@@ -78,7 +78,9 @@ void ViewDataView::parseResponseSensor( const ViewCommand& cmd )
      QList<SensorParam> sensors;
      for( quint32 curIdx = 0; curIdx < cmd.count(); curIdx++ )
      {
-          sensors.push_back( { cmd.at( curIdx )->at( 0 )->toLongLong(), cmd.at( curIdx )->at( 1 )->toString() } );
+          sensors.push_back( { cmd.at( curIdx )->at( 0 )->toLongLong(), cmd.at( curIdx )->at( 1 )->toString(),
+                               cmd.at( curIdx )->at( 2 )->toString(), cmd.at( curIdx )->at( 3 )->toString(),
+                               cmd.at( curIdx )->at( 4 )->toString() } );
      }
      emit sWidgetResponseSensor( sensors );
 }

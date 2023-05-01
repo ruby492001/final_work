@@ -1,10 +1,11 @@
 #include "model.h"
 #include "agent_event.h"
+#include "delegate.h"
 
 
 int EditSensorModel::columnCount( const QModelIndex& ) const
 {
-     return 4;
+     return 7;
 }
 
 
@@ -31,6 +32,18 @@ QVariant EditSensorModel::data( const QModelIndex& index, int role ) const
           case 3:
           {
                return toString( sensors_.at( index.row() ).eventType );
+          }
+          case 4:
+          {
+               return sensors_.at( index.row() ).place;
+          }
+          case 5:
+          {
+               return sensors_.at( index.row() ).type;
+          }
+          case 6:
+          {
+               return sensors_.at( index.row() ).measure;
           }
           default:
           {
@@ -77,11 +90,11 @@ QVariant EditSensorModel::headerData( int section, Qt::Orientation orientation, 
      {
           case 0:
           {
-               return tr( "Клиент" );
+               return tr( "ID Клиента" );
           }
           case 1:
           {
-               return tr( "Датчик" );
+               return tr( "ID Датчика" );
           }
           case 2:
           {
@@ -90,6 +103,18 @@ QVariant EditSensorModel::headerData( int section, Qt::Orientation orientation, 
           case 3:
           {
                return tr( "Тип данных" );
+          }
+          case 4:
+          {
+               return tr( "Расположение" );
+          }
+          case 5:
+          {
+               return tr( "Тип датчика" );
+          }
+          case 6:
+          {
+               return tr( "Единица измерения" );
           }
           default:
           {
@@ -101,7 +126,8 @@ QVariant EditSensorModel::headerData( int section, Qt::Orientation orientation, 
 
 Qt::ItemFlags EditSensorModel::flags( const QModelIndex& index ) const
 {
-     if( index.column() != 2 )
+     int col = index.column();
+     if( col != 2 && col != 4 && col != 5 && col != 6 )
      {
           return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
      }
@@ -109,18 +135,49 @@ Qt::ItemFlags EditSensorModel::flags( const QModelIndex& index ) const
 }
 
 
-bool EditSensorModel::setData( const QModelIndex& index, const QVariant& value, int role )
+bool EditSensorModel::setData( const QModelIndex& index, const QVariant& value, int )
 {
-     if( index.column() != 2 || role != Qt::EditRole )
-     {
-          return false;
-     }
+
      SensorParam* t = static_cast< SensorParam* >( index.internalPointer() );
      if( !t )
      {
           return false;
      }
-     t->userName = value.toString();
+     if( value.toString().isEmpty() )
+     {
+          return true;
+     }
+     switch( index.column() )
+     {
+          case 2:
+          {
+               t->userName = value.toString();
+               break;
+          }
+          case 4:
+          case 5:
+          case 6:
+          {
+               if( index.column() == 4 )
+               {
+                    t->place = value.toString();
+               }
+               if( index.column() == 5 )
+               {
+                    t->type = value.toString();
+               }
+               if( index.column() == 6 )
+               {
+                    t->measure = value.toString();
+               }
+               updateDelegateValues();
+               break;
+          }
+          default:
+          {
+               return false;
+          }
+     }
      emit sDataChanged( *t );
      dataChanged( index, index );
      return true;
@@ -132,4 +189,28 @@ void EditSensorModel::onSetSensorList( const QList<SensorParam>& sensors )
      beginResetModel();
      sensors_ = sensors;
      endResetModel();
+     updateDelegateValues();
+}
+
+
+void EditSensorModel::updateDelegateValues()
+{
+     foreach( const auto& sensor, sensors_ )
+     {
+          if( places.indexOf( sensor.place ) == -1 && !sensor.place.isEmpty() )
+          {
+               places.push_back( sensor.place );
+          }
+          if( types.indexOf( sensor.type ) == -1 && !sensor.type.isEmpty() )
+          {
+               types.push_back( sensor.type );
+          }
+          if( measure.indexOf( sensor.measure ) == -1 && !sensor.measure.isEmpty() )
+          {
+               measure.push_back( sensor.measure );
+          }
+     }
+     places.sort();
+     types.sort();
+     measure.sort();
 }

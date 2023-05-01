@@ -4,7 +4,7 @@
 
 int AddSensorModel::columnCount( const QModelIndex& ) const
 {
-     return 3;
+     return 4;
 }
 
 
@@ -22,15 +22,24 @@ QVariant AddSensorModel::data( const QModelIndex& index, int role ) const
      {
           case 0:
           {
-               return sensors_.at( index.row() ).userName;
+               if( !sensors_.at( index.row() ).userName.isEmpty() )
+               {
+                    return sensors_.at( index.row() ).userName;
+               }
+               return (  "ID клиента:" + QString::number( sensors_.at( index.row() ).clientSensorId >> 32 ) +
+                         ". ID датчика: " + QString::number( sensors_.at( index.row() ).clientSensorId & 0xffffffff ) );
           }
           case 1:
           {
-               return ( sensors_.at( index.row() ).clientSensorId >> 32 );
+               return ( sensors_.at( index.row() ).place );
           }
           case 2:
           {
-               return ( sensors_.at( index.row() ).clientSensorId & 0xffffffff );
+               return ( sensors_.at( index.row() ).type );
+          }
+          case 3:
+          {
+               return ( sensors_.at( index.row() ).measure );
           }
           default:
           {
@@ -81,11 +90,15 @@ QVariant AddSensorModel::headerData( int section, Qt::Orientation orientation, i
           }
           case 1:
           {
-               return tr( "ID Клиента" );
+               return tr( "Расположение" );
           }
           case 2:
           {
-               return tr( "ID датчика" );
+               return tr( "Тип датчика" );
+          }
+          case 3:
+          {
+               return tr( "Единица измерения" );
           }
           default:
           {

@@ -7,14 +7,14 @@
 
 MainWindow::MainWindow()
 {
-     NetCfgDialog dlg;
-     if( !dlg.exec() )
-     {
-          exit( 0 );
-     }
+     //NetCfgDialog dlg;
+     //if( !dlg.exec() )
+     //{
+     //    exit( 0 );
+     //}
      setWindowTitle( tr( "Программа просмотра данных ") );
-     client_ = new ViewConnectionClient( dlg.addr(), dlg.port() );
-     //client_ = new ViewConnectionClient( "localhost", 54321 );
+     //client_ = new ViewConnectionClient( dlg.addr(), dlg.port() );
+     client_ = new ViewConnectionClient( "localhost", 54321 );
 
      connect( client_, &ViewConnectionClient::sConnectionError, this, &MainWindow::onConnectionLost, Qt::DirectConnection );
      connect( client_, &ViewConnectionClient::sConnected, this, &MainWindow::onConnected, Qt::DirectConnection );
@@ -115,7 +115,6 @@ void MainWindow::loadPlugins()
 
      foreach( auto currentPlg, plugins_ )
      {
-          /// todo: нормальное подключение к БД
           currentPlg->init( nullptr );
           QTreeWidgetItem* item = new QTreeWidgetItem( pluginSelector_ );
           item->setIcon(0, currentPlg->icon() );

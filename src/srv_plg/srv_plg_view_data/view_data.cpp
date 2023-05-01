@@ -61,6 +61,9 @@ void EditSensorSrv::onGetValues()
           ViewArgs arg;
           arg.addVariable( cur.clientSensorId );
           arg.addVariable( cur.userName );
+          arg.addVariable( cur.place );
+          arg.addVariable( cur.type );
+          arg.addVariable( cur.measure );
           cmd.addArg( arg );
      }
      emit sSendResponse( cmd );

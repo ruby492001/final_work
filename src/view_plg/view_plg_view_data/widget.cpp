@@ -15,6 +15,7 @@ ViewDataWidget::ViewDataWidget( QWidget* parent )
 
 
      mainLyt->setColumnStretch( 0, 10 );
+     mainLyt->setColumnStretch( 1, 4 );
      mainLyt->setRowStretch( 1, 10 );
      mainLyt->addWidget( plot_, 0, 0, 3, 1 );
 
@@ -52,9 +53,12 @@ ViewDataWidget::ViewDataWidget( QWidget* parent )
 
      elements_ = new QTreeWidget( elementsBox );
      elements_->setRootIsDecorated( false );
-     elements_->setColumnCount( 2 );
+     elements_->setColumnCount( 5 );
      elements_->headerItem()->setText( 0, tr( "Название датчика" ) );
-     elements_->headerItem()->setText( 1, tr( "Цвет графика" ) );
+     elements_->headerItem()->setText( 1, tr( "Расположение" ) );
+     elements_->headerItem()->setText( 2, tr( "Тип датчика" ) );
+     elements_->headerItem()->setText( 3, tr( "Единица измерения" ) );
+     elements_->headerItem()->setText( 4, tr( "Цвет графика" ) );
      elements_->setContextMenuPolicy( Qt::CustomContextMenu );
      connect( elements_, &QTreeWidget::customContextMenuRequested, this, &ViewDataWidget::onContextMenuRequested );
      elementsLyt->addWidget( elements_, 1, 0 );
@@ -86,20 +90,15 @@ void ViewDataWidget::onAddElementBtn()
      }
 
      QTreeWidgetItem* newItem = new QTreeWidgetItem( elements_ );
-     if( dlg_->resName().isEmpty() )
-     {
-          newItem->setText( 0, "ID клиента:" + QString::number( dlg_->resId() >> 32 ) +
-                              ". ID датчика: " + QString::number( dlg_->resId() & 0xffffffff ) );
-     }
-     else
-     {
-          newItem->setText( 0, dlg_->resName() );
-     }
+     newItem->setText( 0, dlg_->resName() );
+     newItem->setText( 1, dlg_->place() );
+     newItem->setText( 2, dlg_->type() );
+     newItem->setText( 3, dlg_->measure() );
      newItem->setData( 0, Qt::UserRole + 1, dlg_->resId() );
      newItem->setData( 0, Qt::UserRole + 2, dlg_->resColor() );
      QPixmap tmp( 30, 30 );
      tmp.fill( dlg_->resColor() );
-     newItem->setIcon( 1, QIcon( tmp ) );
+     newItem->setIcon( 4, QIcon( tmp ) );
      delete dlg_;
      dlg_ = nullptr;
 }

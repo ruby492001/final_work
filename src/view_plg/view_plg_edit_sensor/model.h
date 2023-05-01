@@ -25,5 +25,8 @@ public slots:
      void onSetSensorList( const QList< SensorParam >& sensors );
 
 private:
+     void updateDelegateValues();
+
+private:
      QList< SensorParam > sensors_;
 };

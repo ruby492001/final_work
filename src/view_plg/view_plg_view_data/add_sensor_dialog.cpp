@@ -46,7 +46,12 @@ void AddSensorDialog::onOkBtn()
           QMessageBox::critical( this, tr( "Не выбран цвет график" ), tr( "Цвет графика не выбран. Пожалуйста, выберите цвет графика") );
           return;
      }
-     resName_ = list_->selectionModel()->selectedRows().first().data( Qt::DisplayRole ).toString();
+     int row = list_->selectionModel()->selectedRows().first().row();
+     qDebug() << row;
+     resName_ = model_->data( model_->index( row, 0 ) ).toString();
+     place_ = model_->data( model_->index( row, 1 ) ).toString();
+     type_ = model_->data( model_->index( row, 2 ) ).toString();
+     measure_ = model_->data( model_->index( row, 3 ) ).toString();
      resId_ = list_->selectionModel()->selectedRows().first().data( Qt::UserRole + 1 ).toLongLong();
      accept();
 }
@@ -85,4 +90,22 @@ quint64 AddSensorDialog::resId()
 QColor AddSensorDialog::resColor()
 {
      return resColor_;
+}
+
+
+QString AddSensorDialog::place()
+{
+     return place_;
+}
+
+
+QString AddSensorDialog::type()
+{
+     return type_;
+}
+
+
+QString AddSensorDialog::measure()
+{
+     return measure_;
 }
