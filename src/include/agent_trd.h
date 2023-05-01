@@ -46,7 +46,7 @@ private slots:
      void onSocketError( QAbstractSocket::SocketError error );
 
 private:
-     bool parseEvents( const QByteArray& arr, QList< QPointer< AgentEvent > >& res );
+     bool parseEvents( const QByteArray& arr, QList< std::shared_ptr<AgentEvent> >& res );
 
 private:
      QTcpSocket* socket_;

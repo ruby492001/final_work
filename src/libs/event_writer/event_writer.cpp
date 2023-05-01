@@ -23,16 +23,16 @@ EventWriter::EventWriter( quint64 warnCount, quint64 errorCount )
 }
 
 
-AddToWriteEventResult EventWriter::addToWriteEvent( quint32 clientId, QList<QPointer<AgentEvent>>&& events )
+AddToWriteEventResult EventWriter::addToWriteEvent( quint32 clientId, QList<std::shared_ptr<AgentEvent>>&& events )
 {
      LOG_DURATION( "AddToWriteEvent" )
      AddToWriteEventResult res = AtwerOk;
 
      // проверяем соответствие типов данных
-     if( !validateEventsTypes( clientId, events ) )
-     {
-          res = AtwerDataTypeError;
-     }
+//     if( !validateEventsTypes( clientId, events ) )
+//     {
+//          res = AtwerDataTypeError;
+//     }
 
      QMutexLocker lock( &writeQueueMutex_ );
 
@@ -70,7 +70,7 @@ void EventWriter::run()
                lock.unlock();
                continue;
           }
-          QQueue< QPair< quint32,  QList< QPointer< AgentEvent > > > > internalQueue( std::move( writeQueue_ ) );
+          QQueue< QPair< quint32,  QList< std::shared_ptr<AgentEvent> > > > internalQueue( std::move( writeQueue_ ) );
           writeQueue_.clear();
           lock.unlock();
           if( !writeEvents( internalQueue ) )
@@ -97,7 +97,7 @@ void EventWriter::stop()
      }
 }
 
-bool EventWriter::writeEvents( const QQueue< QPair< quint32, QList< QPointer< AgentEvent > > > >& events )
+bool EventWriter::writeEvents( const QQueue< QPair< quint32, QList< std::shared_ptr<AgentEvent> > > >& events )
 {
      SqlWrapperProtection sql( SqlConnectionManager::getWriteConnection() );
      sql->beginTransaction();
@@ -151,7 +151,7 @@ bool EventWriter::addTypeIfNeed( quint32 clientId, quint32 sensorId, const Agent
 }
 
 
-bool EventWriter::validateEventsTypes( quint32 clientId, const QList<QPointer<AgentEvent>>& events )
+bool EventWriter::validateEventsTypes( quint32 clientId, const QList<std::shared_ptr<AgentEvent>>& events )
 {
      QReadLocker lock( &existTypesMutex_ );
      foreach( const auto& event, events )

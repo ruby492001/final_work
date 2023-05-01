@@ -119,6 +119,7 @@ void SqlConnectionManager::returnConnection( SqlWrapper* wrapper )
      if( wrapper == writeConnection_ )
      {
           writeConnectionIsFree_ = true;
+          condWrite_.notify_all();
           return;
      }
      activeReadConnection_.removeOne( wrapper );

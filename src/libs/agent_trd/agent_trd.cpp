@@ -283,7 +283,7 @@ void ClientTrdWrapper::handleSendDataRequest( const QByteArray& arr )
           return;
      }
      QByteArray dataOnly( arr.data() + headerSize, arr.size() - headerSize );
-     QList< QPointer< AgentEvent > > events;
+     QList< std::shared_ptr<AgentEvent> > events;
      if( !parseEvents( dataOnly, events ) )
      {
           events.clear();
@@ -358,7 +358,7 @@ void ClientTrdWrapper::onSocketError( QAbstractSocket::SocketError error )
 }
 
 
-bool ClientTrdWrapper::parseEvents( const QByteArray& arr, QList< QPointer< AgentEvent > >& res )
+bool ClientTrdWrapper::parseEvents( const QByteArray& arr, QList< std::shared_ptr<AgentEvent> >& res )
 {
      LOG_DURATION( "Parse events" )
      if( ( unsigned long long )arr.size() < sizeof( OneTimeRequest ) )
@@ -399,19 +399,19 @@ bool ClientTrdWrapper::parseEvents( const QByteArray& arr, QList< QPointer< Agen
                }
                if( FLAG_ON( event->flagsMsecs, BOOL_TYPE ) )
                {
-                    res.push_back( new AgentEvent( event->id, time, MSEC( event->flagsMsecs ), BOOL_VALUE( event->flagsMsecs ) ) );
+                    res.push_back( std::make_shared< AgentEvent >( AgentEvent( event->id, time, MSEC( event->flagsMsecs ), BOOL_VALUE( event->flagsMsecs ) ) ) );
                }
                else if( FLAG_ON( event->flagsMsecs, FLOAT_TYPE ) )
                {
-                    res.push_back( new AgentEvent( event->id, time, MSEC( event->flagsMsecs ), AgentEventTypeFloat, event->data ) );
+                    res.push_back( std::make_shared< AgentEvent >( AgentEvent( event->id, time, MSEC( event->flagsMsecs ), AgentEventTypeFloat, event->data ) ) );
                }
                else if( FLAG_ON( event->flagsMsecs, UIN32_TYPE ) )
                {
-                    res.push_back( new AgentEvent( event->id, time, MSEC( event->flagsMsecs ), AgentEventTypeUInt32, event->data ) );
+                    res.push_back( std::make_shared< AgentEvent >( AgentEvent( event->id, time, MSEC( event->flagsMsecs ), AgentEventTypeUInt32, event->data ) ) );
                }
                else if( FLAG_ON( event->flagsMsecs, INT32_TYPE ) )
                {
-                    res.push_back( new AgentEvent( event->id, time, MSEC( event->flagsMsecs ), AgentEventTypeInt32, event->data ) );
+                    res.push_back( std::make_shared< AgentEvent >(  AgentEvent( event->id, time, MSEC( event->flagsMsecs ), AgentEventTypeInt32, event->data ) ) );
                }
                else
                {

@@ -18,7 +18,7 @@ class EventWriter: public QThread
      Q_OBJECT
 public:
      EventWriter( quint64 warnCount = std::numeric_limits< quint64 >::max(), quint64 errorCount = std::numeric_limits< quint64 >::max() );
-     AddToWriteEventResult addToWriteEvent( quint32 clientId, QList< QPointer< AgentEvent > >&& events );
+     AddToWriteEventResult addToWriteEvent( quint32 clientId, QList< std::shared_ptr<AgentEvent> >&& events );
      void run() override;
      bool isInited() const;
      quint64 currentQueueCount();
@@ -39,7 +39,7 @@ private:
 private:
      /// @return если false параметры не были успешно записаны, иначе true
      /// @attention внутри происходит вызов addTypeIfNeed(см. attention)
-     bool writeEvents( const QQueue< QPair< quint32, QList< QPointer< AgentEvent > > > >& events );
+     bool writeEvents( const QQueue< QPair< quint32, QList< std::shared_ptr<AgentEvent> > > >& events );
 
      /// @brief добавляет новый тип данных, если его не существовало ранее
      /// @return true, если тип был добавлен или добавление не требуется. Иначе false.
@@ -53,7 +53,7 @@ private:
      /// @brief проверяет соответствие типов событий уже известным типам
      /// @return true если все типы событий соответствуют ранее заданным типам или ранее типы не были заданы. false если хотя бы одно событие не соответствует
      /// @attention захватывает mutex existTypesMutex_ на чтение
-     bool validateEventsTypes( quint32 clientId, const QList<QPointer<AgentEvent>>& events );
+     bool validateEventsTypes( quint32 clientId, const QList<std::shared_ptr<AgentEvent>>& events );
 
 
      /// @brief проверяет, что тип type соответствует ранее известному типу.
@@ -70,7 +70,7 @@ private:
      QMutex writeQueueMutex_;
      quint64 eventCount_ = 0;
      QWaitCondition queueCondition_;
-     QQueue< QPair< quint32,  QList< QPointer< AgentEvent > > > > writeQueue_;
+     QQueue< QPair< quint32,  QList< std::shared_ptr<AgentEvent> > > > writeQueue_;
 
      QReadWriteLock existTypesMutex_;
      /// @param quint64 = clientId << 32 | sensorId
