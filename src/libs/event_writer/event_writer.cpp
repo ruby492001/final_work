@@ -235,3 +235,9 @@ void EventWriter::prepareEvent( quint32 clientId, const AgentEvent& event, DataT
           }
      }
 }
+
+quint64 EventWriter::currentQueueCount()
+{
+     QMutexLocker lock( &writeQueueMutex_ );
+     return writeQueue_.count();
+}

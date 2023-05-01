@@ -1,6 +1,7 @@
 qt_add_executable(server_bin
         main.cpp
         app.cpp
+        tracer.cpp
         )
 
 

@@ -1,3 +1,4 @@
+#pragma once
 #include "db_wrapper.h"
 #include "agent_event.h"
 #include "limits"
@@ -20,6 +21,7 @@ public:
      AddToWriteEventResult addToWriteEvent( quint32 clientId, QList< QPointer< AgentEvent > >&& events );
      void run() override;
      bool isInited() const;
+     quint64 currentQueueCount();
 
 public slots:
      void stop();

@@ -6,6 +6,7 @@
 #include "db_wrapper.h"
 #include "event_writer.h"
 #include "view_connection_server.h"
+#include "tracer.h"
 
 
 class ServerApp: public QCoreApplication
@@ -20,4 +21,6 @@ private:
      AgentConnectionServer* server_;
      SqlConnectionManager* manager_;
      ViewConnectionServer* viewServer_;
+     bool help = false;
+     Tracer* tracer_;
 };

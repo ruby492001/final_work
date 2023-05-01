@@ -48,6 +48,7 @@ public:
      void setValue( quint32 value );
      void setValue( qint32 value );
      void setValue( float value );
+     void setTime( quint64 time ){ time_ = time; };
 
 
 private:
