@@ -312,7 +312,7 @@ void ClientTrdWrapper::handleSendDataRequest( const QByteArray& arr )
           case AtwerCountError:
           {
                response->ok = false;
-               response->errorCode = TO_MANY_REQUESTS_ERROR;
+               returnError( TO_MANY_REQUESTS_ERROR );
                break;
           }
           case AtwerDataTypeError:

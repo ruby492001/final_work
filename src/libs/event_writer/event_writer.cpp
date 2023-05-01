@@ -29,18 +29,17 @@ AddToWriteEventResult EventWriter::addToWriteEvent( quint32 clientId, QList<std:
      AddToWriteEventResult res = AtwerOk;
 
      // проверяем соответствие типов данных
-//     if( !validateEventsTypes( clientId, events ) )
-//     {
-//          res = AtwerDataTypeError;
-//     }
 
      QMutexLocker lock( &writeQueueMutex_ );
-
-     if( ( long long )errorCount_ < events.count() + writeQueue_.count() )
+     quint64 count = 0;
+     foreach( const auto& cur, writeQueue_ )
      {
-          res = AtwerCountError;
+          count += cur.second.count();
+     }
+     if( errorCount_ < count )
+     {
           qCritical() << "Аварийное состояние! Завершение всех соединений и остановка программы!";
-          exit( -1 );
+          res = AtwerCountError;
      }
 
      if( res == AtwerOk )
@@ -72,8 +71,9 @@ void EventWriter::run()
                lock.unlock();
                continue;
           }
-          QQueue< QPair< quint32,  QList< std::shared_ptr<AgentEvent> > > > internalQueue( std::move( writeQueue_ ) );
-          writeQueue_.clear();
+          QQueue< QPair< quint32,  QList< std::shared_ptr<AgentEvent> > > > internalQueue;
+          internalQueue.append( writeQueue_.begin(), writeQueue_.begin() + 1 );
+          writeQueue_.erase( writeQueue_.begin(), writeQueue_.begin() + 1 );
           lock.unlock();
           if( !writeEvents( internalQueue ) )
           {

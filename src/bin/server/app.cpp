@@ -66,7 +66,7 @@ ServerApp::ServerApp( int argc, char** argv )
      }
      manager_ = new SqlConnectionManager( "../etc/event.db" );
      CredValidator::init();
-     eventWriter = new EventWriter( 20'000'000, 100'000'000 );
+     eventWriter = new EventWriter( 2'000'000, 10'000'000 );
      server_ = new AgentConnectionServer( agentPort );
      viewServer_ = new ViewConnectionServer( viewPort );
      if( trace )
