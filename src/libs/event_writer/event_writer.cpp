@@ -28,6 +28,10 @@ AddToWriteEventResult EventWriter::addToWriteEvent( quint32 clientId, QList<std:
      //LOG_DURATION( "AddToWriteEvent" )
      AddToWriteEventResult res = AtwerOk;
 
+     if( error )
+     {
+          return AtwerCountError;
+     }
      // проверяем соответствие типов данных
 
      QMutexLocker lock( &writeQueueMutex_ );
@@ -38,7 +42,8 @@ AddToWriteEventResult EventWriter::addToWriteEvent( quint32 clientId, QList<std:
      }
      if( errorCount_ < count )
      {
-          qCritical() << "Аварийное состояние! Завершение всех соединений и остановка программы!";
+          error = true;
+          qCritical() << "Аварийное состояние! Завершение всех соединений!";
           res = AtwerCountError;
      }
 

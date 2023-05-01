@@ -87,6 +87,7 @@ private:
      quint32 cacheQuint;
      qint32 cacheQint;
      float cacheFloat;
+     bool error = false;
 };
 
 extern EventWriter* eventWriter;
