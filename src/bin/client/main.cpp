@@ -21,16 +21,15 @@ int main( int argc, char** argv )
      cli.onConnect();
      qDebug() << cli.connectedState();
      quint64 curTime = QDateTime::currentSecsSinceEpoch();
-     for( int a = 0; a < 1'000'000; a++ )
+     float curVal = 50;
+     for( int a = 0; a < 500; a++ )
      {
-          if( a < 500'000 )
+          cli.onAddEvent( AgentEvent( 0, curTime, 0,  QVariant::fromValue( ( float )70) ) );
+          if( curVal < 80 )
           {
-               cli.onAddEvent( AgentEvent( 0, curTime, 0,  QVariant::fromValue( true ) ) );
+               curVal += 0.2;
           }
-          else
-          {
-               cli.onAddEvent( AgentEvent( 0, curTime, 0,  QVariant::fromValue( false ) ) );
-          }
+          cli.onAddEvent( AgentEvent( 1, curTime, 0,  QVariant::fromValue( curVal ) ) );
           curTime++;
      }
      cli.onFlushEvents();
