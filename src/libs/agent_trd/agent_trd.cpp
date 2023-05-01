@@ -322,7 +322,7 @@ void ClientTrdWrapper::handleSendDataRequest( const QByteArray& arr )
                break;
           }
      }
-     qDebug() << "Write data result: " << response->ok << response->errorCode;
+     //qDebug() << "Write data result: " << response->ok << response->errorCode;
      if( responseBa.size() != socket_->write( responseBa ) )
      {
           qCritical() << "Cannot write response for handle send data req";
@@ -360,7 +360,7 @@ void ClientTrdWrapper::onSocketError( QAbstractSocket::SocketError error )
 
 bool ClientTrdWrapper::parseEvents( const QByteArray& arr, QList< std::shared_ptr<AgentEvent> >& res )
 {
-     LOG_DURATION( "Parse events" )
+     //LOG_DURATION( "Parse events" )
      if( ( unsigned long long )arr.size() < sizeof( OneTimeRequest ) )
      {
           return true;

@@ -25,7 +25,7 @@ EventWriter::EventWriter( quint64 warnCount, quint64 errorCount )
 
 AddToWriteEventResult EventWriter::addToWriteEvent( quint32 clientId, QList<std::shared_ptr<AgentEvent>>&& events )
 {
-     LOG_DURATION( "AddToWriteEvent" )
+     //LOG_DURATION( "AddToWriteEvent" )
      AddToWriteEventResult res = AtwerOk;
 
      // проверяем соответствие типов данных
@@ -39,6 +39,8 @@ AddToWriteEventResult EventWriter::addToWriteEvent( quint32 clientId, QList<std:
      if( ( long long )errorCount_ < events.count() + writeQueue_.count() )
      {
           res = AtwerCountError;
+          qCritical() << "Аварийное состояние! Завершение всех соединений и остановка программы!";
+          exit( -1 );
      }
 
      if( res == AtwerOk )
@@ -102,7 +104,7 @@ bool EventWriter::writeEvents( const QQueue< QPair< quint32, QList< std::shared_
      SqlWrapperProtection sql( SqlConnectionManager::getWriteConnection() );
      sql->beginTransaction();
      DataToWrite dataToWrite;
-     LogDuration* prepare = new LogDuration( "Prepare" );
+     //LogDuration* prepare = new LogDuration( "Prepare" );
      foreach( const auto& eventsOneClient, events )
      {
           foreach( const auto& event, eventsOneClient.second )
@@ -114,12 +116,12 @@ bool EventWriter::writeEvents( const QQueue< QPair< quint32, QList< std::shared_
                prepareEvent( eventsOneClient.first, *event, dataToWrite );
           }
      }
-     delete prepare;
+     //delete prepare;
 
-     prepare = new LogDuration( "Write" );
+     //prepare = new LogDuration( "Write" );
      sql->writeSomeEvents( dataToWrite.clientId, dataToWrite.sensorId, dataToWrite.time, dataToWrite.msecs, dataToWrite.data );
      sql->commitTransaction();
-     delete prepare;
+     //delete prepare;
      return true;
 }
 
@@ -238,6 +240,11 @@ void EventWriter::prepareEvent( quint32 clientId, const AgentEvent& event, DataT
 
 quint64 EventWriter::currentQueueCount()
 {
+     quint64 count = 0;
      QMutexLocker lock( &writeQueueMutex_ );
-     return writeQueue_.count();
+     for( int a = 0; a < writeQueue_.count(); a++ )
+     {
+          count += writeQueue_.at( a ).second.count();
+     }
+     return count;
 }
