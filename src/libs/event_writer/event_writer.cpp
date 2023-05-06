@@ -45,6 +45,7 @@ AddToWriteEventResult EventWriter::addToWriteEvent( quint32 clientId, QList<std:
           error = true;
           qCritical() << "Аварийное состояние! Завершение всех соединений!";
           res = AtwerCountError;
+          queueCondition_.wakeAll();
      }
 
      if( res == AtwerOk )
