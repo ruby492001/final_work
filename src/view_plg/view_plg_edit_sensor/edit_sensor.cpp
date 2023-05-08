@@ -21,7 +21,7 @@ QIcon EditSensorView::icon() const
 }
 
 
-void EditSensorView::init( QSqlDatabase* )
+void EditSensorView::init()
 {
 }
 

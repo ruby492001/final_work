@@ -15,7 +15,7 @@ public:
      quint32 id() const override;
      QIcon icon() const override;
      quint32 priority() const override;
-     void init( QSqlDatabase* db ) override;
+     void init() override;
      QWidget* widget( QWidget* parent ) override;
 
 public slots:

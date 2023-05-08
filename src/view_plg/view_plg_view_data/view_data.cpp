@@ -18,7 +18,7 @@ quint32 ViewDataView::priority() const
 }
 
 
-void ViewDataView::init( QSqlDatabase* )
+void ViewDataView::init()
 {
 }
 
